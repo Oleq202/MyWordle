@@ -9,32 +9,21 @@ let word = ''
 async function initGame(){
     const wordData = await getRandomWord();
     if (wordData){
-        word = wordData[0].toUpperCase();
-        console.log("Word aquired!");
+        word = wordData.toUpperCase();
+        console.log("Word acquired!");
     }
 }
 
 initGame();
 
-async function getRandomWord() {
+async function getRandomWord(){
     try {
-        const response = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/word');
-        const wordsList = ["APPLE", "BEACH", "CHIEF", "DRIVE", "EARTH", "FLAME", "GUIDE", "HOUSE", "IMAGE", "JUDGE", "KNIFE", "LIGHT", "MATCH", "NIGHT", "OCEAN", "PAPER", "QUEEN", "RADIO", "SNAKE", "TABLE", "UNCLE", "VOICE", "WATER", "YOUTH", "ZEBRA"];
-        
-        const fallbackResponse = await fetch('https://raw.githubusercontent.com/charlesreid1/five-letter-words/master/sgb-words.txt');
-        if (fallbackResponse.ok) {
-            const text = await fallbackResponse.text();
-            const allWords = text.split('\n').filter(w => w.trim().length === 5);
-            const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-            return [randomWord]; // Returns array to keep your original initGame() logic intact
-        }
-
-        const localRandom = wordsList[Math.floor(Math.random() * wordsList.length)];
-        return [localRandom];
-
-    } catch (error) {
-        console.error("Request failed, using fallback word pack", error);
-        return ["WORDS"];
+        const response = await fetch('words.txt');
+        const text = await response.text();
+        const words = text.split('\n').map(w => w.trim()).filter(w => w.length === 5 && /^[a-zA-Z]+$/.test(w));
+        return words[Math.floor(Math.random() * words.length)];
+    } catch (error){
+        console.error("Failed to load word list:", error);
     }
 }
 
