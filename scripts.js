@@ -16,14 +16,25 @@ async function initGame(){
 
 initGame();
 
-async function getRandomWord(){
+async function getRandomWord() {
     try {
-        const randomDiff = Math.floor(Math.random() * 2) + 1;
-        const wordResponse = await fetch(`https://random-word-api.herokuapp.com/word?length=5&diff=${randomDiff}`);
-        const word = await wordResponse.json();
-        return word;
-    } catch (error){
-        console.error("request failed")
+        const response = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/word');
+        const wordsList = ["APPLE", "BEACH", "CHIEF", "DRIVE", "EARTH", "FLAME", "GUIDE", "HOUSE", "IMAGE", "JUDGE", "KNIFE", "LIGHT", "MATCH", "NIGHT", "OCEAN", "PAPER", "QUEEN", "RADIO", "SNAKE", "TABLE", "UNCLE", "VOICE", "WATER", "YOUTH", "ZEBRA"];
+        
+        const fallbackResponse = await fetch('https://raw.githubusercontent.com/charlesreid1/five-letter-words/master/sgb-words.txt');
+        if (fallbackResponse.ok) {
+            const text = await fallbackResponse.text();
+            const allWords = text.split('\n').filter(w => w.trim().length === 5);
+            const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+            return [randomWord]; // Returns array to keep your original initGame() logic intact
+        }
+
+        const localRandom = wordsList[Math.floor(Math.random() * wordsList.length)];
+        return [localRandom];
+
+    } catch (error) {
+        console.error("Request failed, using fallback word pack", error);
+        return ["WORDS"];
     }
 }
 
